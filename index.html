@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#3b5bdb">
+<title>Study Tracker · 6-Month Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f3f5fb;--card:#fff;--ink:#14213d;--mute:#6b7692;--line:#e2e6f1;--acc:#3b5bdb;--acc2:#e7ecff;--up:#12a150;--down:#e03131;--flat:#8a93a8}
+:root[data-theme=dark]{--bg:#0d1220;--card:#161d31;--ink:#e8ecf8;--mute:#93a0c0;--line:#252e48;--acc:#7c95ff;--acc2:#222c52;--up:#3ddc84;--down:#ff6b6b;--flat:#8a93a8}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;overflow-x:hidden}
+body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,Roboto,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.45;padding:0 14px calc(28px + env(safe-area-inset-bottom));transition:background .3s,color .3s}
+main{max-width:640px;margin:0 auto}
+header{display:flex;justify-content:space-between;align-items:center;padding:calc(16px + env(safe-area-inset-top)) 0 10px}
+h1{font-size:1.3rem;margin:0;font-weight:800}
+h2{font-size:1.05rem;margin:0 0 10px;font-weight:800}
+.sub{color:var(--mute);font-size:.85rem}
+button,input,select{font:inherit;color:inherit}
+button{border:0;cursor:pointer;min-height:48px;border-radius:14px;padding:0 16px;font-weight:600;background:var(--acc2);color:var(--acc);transition:transform .1s,opacity .2s}
+button:active{transform:scale(.96)}
+.primary{background:var(--acc);color:#fff}
+.danger{background:transparent;color:var(--down);border:1.5px solid var(--down)}
+.icon{width:48px;padding:0;font-size:1.2rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:14px}
+.hero{background:var(--acc);color:#fff;border:0}
+.hero .sub{color:#dbe3ff}
+.hero h2{font-size:1.5rem;margin:2px 0}
+.nav{display:flex;gap:8px;align-items:center;margin-top:12px}
+.nav button{background:rgba(255,255,255,.18);color:#fff}
+.nav input{flex:1;min-width:0;height:48px;border-radius:14px;border:0;background:rgba(255,255,255,.95);color:#14213d;padding:0 10px;font-weight:600;text-align:center}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px}
+.stat b{display:block;font-size:1.5rem;font-weight:800;line-height:1.2}
+.stat span{font-size:.78rem;color:var(--mute)}
+.pill{display:inline-block;font-size:.8rem;font-weight:600;padding:2px 10px;border-radius:99px;background:var(--acc2);color:var(--acc)}
+.pill.ok{background:rgba(18,161,80,.15);color:var(--up)}
+.pill.no{background:rgba(224,49,49,.13);color:var(--down)}
+.field{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.field label{font-weight:600;flex:1}
+.step{display:flex;gap:6px;align-items:center}
+.step input{width:76px;height:48px;text-align:center;border:1.5px solid var(--line);border-radius:12px;background:var(--bg);font-weight:800;font-size:1.1rem}
+.step button{width:48px;padding:0;font-size:1.4rem}
+.seg{display:flex;background:var(--bg);border-radius:14px;padding:4px;gap:4px}
+.seg button{flex:1;min-height:44px;background:transparent;color:var(--mute)}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.seg button.on.yes{color:var(--up)}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;color:var(--mute);margin:6px 0 10px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.chartbox{position:relative;height:230px}
+.note{font-size:.8rem;color:var(--mute);margin:10px 0 0}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+td{padding:9px 0;border-bottom:1px solid var(--line)}td:last-child{text-align:right;font-weight:600}
+tr:last-child td{border:0}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translate(-50%,80px);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:14px;font-weight:600;opacity:0;transition:.3s;z-index:9;max-width:90%}
+.toast.show{transform:translate(-50%,0);opacity:1}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div><h1>Study Tracker</h1><div class="sub" id="period"></div></div>
+  <button class="icon" id="themeBtn" aria-label="Toggle dark mode">🌙</button>
+</header>
+
+<section class="card hero">
+  <div class="sub" id="todayLabel"></div>
+  <h2 id="selLabel"></h2>
+  <div class="sub" id="dayNo"></div>
+  <div class="nav">
+    <button class="icon" id="prev" aria-label="Previous day">‹</button>
+    <input type="date" id="picker" aria-label="Pick a date">
+    <button class="icon" id="next" aria-label="Next day">›</button>
+  </div>
+  <div class="nav"><button style="flex:1" id="goToday">Jump to today</button></div>
+</section>
+
+<section class="grid" id="stats"></section>
+
+<section class="card">
+  <h2>Log for <span id="formDate"></span></h2>
+  <div class="field"><label for="l">Lectures</label><div class="step"><button data-s="l" data-d="-1">−</button><input id="l" type="number" inputmode="numeric" min="0" max="99"><button data-s="l" data-d="1">+</button></div></div>
+  <div class="field"><label for="d">DPPs</label><div class="step"><button data-s="d" data-d="-1">−</button><input id="d" type="number" inputmode="numeric" min="0" max="99"><button data-s="d" data-d="1">+</button></div></div>
+  <div class="field"><label for="q">Questions</label><div class="step"><button data-s="q" data-d="-5">−5</button><input id="q" type="number" inputmode="numeric" min="0" max="9999"><button data-s="q" data-d="5">+5</button></div></div>
+  <div class="field"><label>Revision</label></div>
+  <div class="seg" id="rev"><button data-r="0" class="on">Not completed</button><button data-r="1" class="yes">Completed</button></div>
+  <div class="row" style="margin-top:14px"><button class="primary" id="save">Save day</button><button class="danger" id="del">Delete day</button></div>
+</section>
+
+<section class="card">
+  <h2>Trends</h2>
+  <div class="seg" id="range"><button data-n="7">7 days</button><button data-n="30" class="on">30 days</button><button data-n="0">6 months</button></div>
+  <div class="legend"><span><i style="background:var(--up)"></i>Up from yesterday</span><span><i style="background:var(--down)"></i>Down</span><span><i style="background:var(--flat)"></i>Same</span></div>
+</section>
+<section class="card"><h2>Lectures per day</h2><div class="chartbox"><canvas id="c1"></canvas></div></section>
+<section class="card"><h2>DPPs per day</h2><div class="chartbox"><canvas id="c2"></canvas></div></section>
+<section class="card"><h2>Questions per day</h2><div class="chartbox"><canvas id="c3"></canvas></div></section>
+<section class="card"><h2>Overall growth</h2><div class="chartbox"><canvas id="c4"></canvas></div>
+  <p class="note"><b>How it's calculated:</b> each day's lectures, DPPs and questions are divided by your own best day for that metric (so 1.0 = your record), then averaged and shown out of 100. This stops big question counts from drowning out lectures and DPPs.</p></section>
+
+<section class="card">
+  <h2>Summary</h2>
+  <div class="seg" id="sumTabs" style="margin-bottom:8px"><button data-n="7">7 days</button><button data-n="30" class="on">30 days</button><button data-n="0">6 months</button></div>
+  <table id="sum"></table>
+</section>
+
+<section class="card">
+  <h2>Backup &amp; data</h2>
+  <div class="row"><button id="exp">Export</button><button id="imp">Import</button></div>
+  <input type="file" id="file" accept="application/json,.json" hidden>
+  <button class="danger" id="reset" style="width:100%;margin-top:10px">Reset all data</button>
+  <p class="note">Your data lives only in this browser. Export a backup now and then, especially before clearing browser data.</p>
+</section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY='study_tracker_v1';
+const $=id=>document.getElementById(id);
+const pad=n=>String(n).padStart(2,'0');
+const fmt=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const pd=s=>{const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c)};
+const addDays=(s,n)=>{const d=pd(s);d.setDate(d.getDate()+n);return fmt(d)};
+const diff=(a,b)=>Math.round((pd(b)-pd(a))/864e5);
+const nice=(s,o)=>pd(s).toLocaleDateString(undefined,o||{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+const num=v=>Math.max(0,Math.floor(Number(v)||0));
+
+function load(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j&&j.start&&j.entries)return j}catch(e){}return{start:fmt(new Date()),entries:{},theme:null}}
+let S=load();
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('Could not save — browser storage is blocked')}}
+persist();
+
+function endOf(start){const d=pd(start);const day=d.getDate();const e=new Date(d.getFullYear(),d.getMonth()+6,1);
+  const last=new Date(e.getFullYear(),e.getMonth()+1,0).getDate();e.setDate(Math.min(day,last));e.setDate(e.getDate()-1);return fmt(e)}
+let START=S.start,END=endOf(START);
+const realToday=()=>fmt(new Date());
+const clamp=s=>s<START?START:s>END?END:s;
+const todayC=()=>clamp(realToday());
+let sel=todayC(),rangeN=30,sumN=30,charts=[];
+const get=d=>S.entries[d]||{l:0,d:0,q:0,r:0};
+const active=e=>e&&(e.l+e.d+e.q>0||e.r);
+
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200)}
+
+/* ---------- theme ---------- */
+function applyTheme(t){document.documentElement.dataset.theme=t;$('themeBtn').textContent=t==='dark'?'☀️':'🌙';renderCharts()}
+$('themeBtn').onclick=()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';S.theme=t;persist();applyTheme(t)};
+
+/* ---------- days helpers ---------- */
+function daysBetween(a,b){const r=[];for(let d=a;d<=b;d=addDays(d,1))r.push(d);return r}
+function windowDays(n){const end=todayC();const st=n?clamp(addDays(end,-n+1)):START;return daysBetween(st,end)}
+function streaks(){let best=0,run=0,cur=0;const days=daysBetween(START,todayC());
+  days.forEach(d=>{if(active(S.entries[d])){run++;best=Math.max(best,run)}else run=0});
+  let i=days.length-1;if(i>=0&&!active(S.entries[days[i]]))i--;
+  while(i>=0&&active(S.entries[days[i]])){cur++;i--}
+  return{cur,best}}
+
+/* ---------- render ---------- */
+function render(){
+  $('period').textContent=nice(START,{day:'numeric',month:'short',year:'numeric'})+' → '+nice(END,{day:'numeric',month:'short',year:'numeric'});
+  $('todayLabel').textContent='Today · '+nice(realToday(),{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  $('selLabel').textContent=nice(sel,{weekday:'long',day:'numeric',month:'short'});
+  const dn=diff(START,sel)+1,tot=diff(START,END)+1;
+  $('dayNo').textContent='Day '+dn+' of '+tot;
+  $('formDate').textContent=nice(sel,{day:'numeric',month:'short'});
+  const p=$('picker');p.min=START;p.max=END;p.value=sel;
+  $('prev').disabled=sel<=START;$('next').disabled=sel>=END;
+  $('prev').style.opacity=sel<=START?.4:1;$('next').style.opacity=sel>=END?.4:1;
+  const e=get(sel);$('l').value=e.l;$('d').value=e.d;$('q').value=e.q;setRev(e.r);
+  renderStats();renderSummary();renderCharts();
+}
+function setRev(v){document.querySelectorAll('#rev button').forEach(b=>b.classList.toggle('on',+b.dataset.r===+v))}
+function getRev(){return +document.querySelector('#rev .on').dataset.r}
+
+function renderStats(){
+  const t=get(todayC()),all=daysBetween(START,todayC()).map(get);
+  const sum=k=>all.reduce((a,x)=>a+x[k],0),st=streaks();
+  const revPct=all.length?Math.round(all.filter(x=>x.r).length/all.length*100):0;
+  const cards=[['Today · lectures',t.l],['Today · DPPs',t.d],['Today · questions',t.q],
+   ['Today · revision',t.r?'<span class="pill ok">Done</span>':'<span class="pill no">Pending</span>'],
+   ['Total lectures',sum('l')],['Total DPPs',sum('d')],['Total questions',sum('q')],['Revision rate',revPct+'%'],
+   ['Current streak',st.cur+' d'],['Best streak',st.best+' d']];
+  $('stats').innerHTML=cards.map(c=>`<div class="stat"><b>${c[1]}</b><span>${c[0]}</span></div>`).join('');
+}
+
+function renderSummary(){
+  const days=windowDays(sumN),es=days.map(get),n=days.length||1;
+  const sum=k=>es.reduce((a,x)=>a+x[k],0);
+  const top=k=>{let bi=-1,bv=0;es.forEach((x,i)=>{if(x[k]>bv){bv=x[k];bi=i}});return bv?bv+' · '+nice(days[bi],{day:'numeric',month:'short'}):'—'};
+  const avg=k=>(sum(k)/n).toFixed(1);
+  const rv=es.filter(x=>x.r).length;
+  const rows=[['Days counted',n],['Lectures',sum('l')],['DPPs',sum('d')],['Questions',sum('q')],
+   ['Avg lectures / day',avg('l')],['Avg DPPs / day',avg('d')],['Avg questions / day',avg('q')],
+   ['Most lectures',top('l')],['Most DPPs',top('d')],['Most questions',top('q')],
+   ['Revision completed',rv+' of '+n+' ('+Math.round(rv/n*100)+'%)']];
+  $('sum').innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('');
+}
+
+/* ---------- charts ---------- */
+const cs=()=>getComputedStyle(document.documentElement);
+const col=(d)=>{const s=cs();return d>0?s.getPropertyValue('--up').trim():d<0?s.getPropertyValue('--down').trim():s.getPropertyValue('--flat').trim()};
+function series(){
+  const days=windowDays(rangeN),es=days.map(get);
+  const all=daysBetween(START,todayC()).map(get);
+  const mx=k=>Math.max(1,...all.map(x=>x[k]));
+  const ml=mx('l'),md=mx('d'),mq=mx('q');
+  return{days,l:es.map(x=>x.l),d:es.map(x=>x.d),q:es.map(x=>x.q),
+    o:es.map(x=>+((x.l/ml+x.d/md+x.q/mq)/3*100).toFixed(1))};
+}
+function renderCharts(){
+  if(!window.Chart)return;
+  const s=series(),ids=['c1','c2','c3','c4'],keys=['l','d','q','o'],names=['Lectures','DPPs','Questions','Overall score'];
+  const st=cs(),grid=st.getPropertyValue('--line').trim(),tick=st.getPropertyValue('--mute').trim();
+  const labels=s.days.map(d=>nice(d,{day:'numeric',month:'short'}));
+  ids.forEach((id,i)=>{
+    const data=s[keys[i]];
+    const pc=data.map((v,j)=>col(j?v-data[j-1]:0));
+    const ds={label:names[i],data,borderWidth:3,tension:.3,pointRadius:data.length>40?0:4,pointHoverRadius:6,
+      pointBackgroundColor:pc,pointBorderColor:pc,
+      segment:{borderColor:c=>col(c.p1.parsed.y-c.p0.parsed.y)}};
+    if(charts[i]){const c=charts[i];c.data.labels=labels;c.data.datasets[0]=ds;
+      c.options.scales.x.grid.color=grid;c.options.scales.y.grid.color=grid;c.options.scales.x.ticks.color=tick;c.options.scales.y.ticks.color=tick;
+      c.options.scales.y.max=i===3?100:undefined;c.update();return}
+    charts[i]=new Chart($(id),{type:'line',data:{labels,datasets:[ds]},options:{
+      responsive:true,maintainAspectRatio:false,animation:{duration:400},interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{callbacks:{afterLabel:c=>{const j=c.dataIndex;if(!j)return'';const dv=+(c.parsed.y-data[j-1]).toFixed(1);return(dv>0?'▲ +':dv<0?'▼ ':'● ')+dv+' vs previous day'}}}},
+      scales:{x:{grid:{color:grid},ticks:{color:tick,maxTicksLimit:6,maxRotation:0}},y:{beginAtZero:true,max:i===3?100:undefined,grid:{color:grid},ticks:{color:tick,precision:0}}}}});
+  });
+}
+
+/* ---------- events ---------- */
+function go(d){sel=clamp(d);render()}
+$('prev').onclick=()=>go(addDays(sel,-1));
+$('next').onclick=()=>go(addDays(sel,1));
+$('goToday').onclick=()=>go(todayC());
+$('picker').onchange=e=>{if(e.target.value)go(e.target.value)};
+document.querySelectorAll('.step button').forEach(b=>b.onclick=()=>{const i=$(b.dataset.s);i.value=Math.max(0,num(i.value)+Number(b.dataset.d))});
+document.querySelectorAll('#rev button').forEach(b=>b.onclick=()=>setRev(b.dataset.r));
+$('save').onclick=()=>{S.entries[sel]={l:num($('l').value),d:num($('d').value),q:num($('q').value),r:getRev()};persist();render();toast('Saved')};
+$('del').onclick=()=>{if(!S.entries[sel]){toast('Nothing to delete for this day');return}
+  if(confirm('Delete the data for '+nice(sel)+'?')){delete S.entries[sel];persist();render();toast('Deleted')}};
+document.querySelectorAll('#range button').forEach(b=>b.onclick=()=>{rangeN=+b.dataset.n;document.querySelectorAll('#range button').forEach(x=>x.classList.toggle('on',x===b));renderCharts()});
+document.querySelectorAll('#sumTabs button').forEach(b=>b.onclick=()=>{sumN=+b.dataset.n;document.querySelectorAll('#sumTabs button').forEach(x=>x.classList.toggle('on',x===b));renderSummary()});
+
+$('exp').onclick=()=>{const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='study-tracker-backup-'+realToday()+'.json';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('Backup downloaded')};
+$('imp').onclick=()=>$('file').click();
+$('file').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{try{const j=JSON.parse(r.result);
+    if(!j||typeof j.start!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(j.start)||typeof j.entries!=='object')throw 0;
+    if(!confirm('Replace your current data with this backup?'))return;
+    const clean={};Object.keys(j.entries).forEach(k=>{if(/^\d{4}-\d{2}-\d{2}$/.test(k)){const x=j.entries[k]||{};clean[k]={l:num(x.l),d:num(x.d),q:num(x.q),r:x.r?1:0}}});
+    S={start:j.start,entries:clean,theme:j.theme||S.theme};START=S.start;END=endOf(START);persist();sel=todayC();
+    if(S.theme)applyTheme(S.theme);render();toast('Data imported')}catch(err){toast('That file is not a valid backup')}
+    e.target.value=''};r.readAsText(f)};
+$('reset').onclick=()=>{if(confirm('⚠️ This permanently deletes ALL your data and restarts your 6-month plan from today.\n\nExport a backup first if unsure. Continue?')){
+  S={start:realToday(),entries:{},theme:S.theme};START=S.start;END=endOf(START);persist();sel=todayC();render();toast('All data reset')}};
+
+/* midnight rollover: refresh when the tab becomes visible on a new day */
+let lastDay=realToday();
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&realToday()!==lastDay){lastDay=realToday();sel=todayC();render()}});
+
+/* ---------- start ---------- */
+const initTheme=S.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+document.documentElement.dataset.theme=initTheme;$('themeBtn').textContent=initTheme==='dark'?'☀️':'🌙';
+render();
+</script>
+</body>
+</html>
